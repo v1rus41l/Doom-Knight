@@ -1,0 +1,2 @@
+WIDTH = 850
+HEIGHT = 450
