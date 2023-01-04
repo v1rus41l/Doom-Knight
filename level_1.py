@@ -29,6 +29,8 @@ img_count = 0
 jump_count = 10
 is_jump = False
 check_of_fall = True
+check_of_fall_2 = True
+check_of_fall_3 = True
 
 # FPS = 50
 
@@ -36,6 +38,7 @@ size = width, height = 500, 500
 pygame.init()
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
+falling = False
 
 player = None
 
@@ -107,7 +110,7 @@ action = False
 
 # группы спрайтов
 def main():
-    global is_jump, action, check_of_fall
+    global is_jump, action, check_of_fall, check_of_fall_2, check_of_fall_3, falling
     pygame.init()
     size = width, height = 850, 450
     screen = pygame.display.set_mode(size)
@@ -123,11 +126,29 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
         screen.blit(fon, (0, 0))
-        if knight.rect.x < 125 and knight.rect.y != 170 and check_of_fall:
+        if ((knight.rect.x < 125 and knight.rect.y != 170) or (knight.rect.x < 255 and knight.rect.y != 170 and 50 < knight.rect.y < 170)) and check_of_fall:
             knight.rect.y += 10
-            clock.tick(45)
+            clock.tick(60)
+            falling = True
         if knight.rect.y == 170:
             check_of_fall = False
+            falling = False
+        if ((knight.rect.x > 690 and knight.rect.y > 50 and knight.rect.y != 290) or (knight.rect.x > 600 and knight.rect.y > 50 and knight.rect.y != 290 and 170 < knight.rect.y < 290)) and check_of_fall_2:
+            knight.rect.y += 10
+            clock.tick(60)
+            falling = True
+        if knight.rect.y == 290:
+            check_of_fall_2 = False
+            falling = False
+            knight.rect.y -= 5
+        if (knight.rect.x < 130 and knight.rect.y != 405 and 285 <= knight.rect.y) and check_of_fall_3:
+            knight.rect.y += 10
+            clock.tick(45)
+            falling = True
+        if knight.rect.y == 405:
+            check_of_fall_3 = False
+            falling = False
+            knight.rect.y -= 5
         if pygame.key.get_pressed()[pygame.K_RIGHT] or pygame.key.get_pressed()[pygame.K_LEFT]:
             # if knight.rect.x < 120 and knight.rect.y == 50:
             #     for i in range(60):
@@ -143,7 +164,7 @@ def main():
                 vector = False
                 Knight.animation(knight, vector)
                 action = True
-        if pygame.key.get_pressed()[pygame.K_UP]:
+        if pygame.key.get_pressed()[pygame.K_UP] and not falling:
             is_jump = True
         if is_jump:
             Knight.jumping(knight, vector)
