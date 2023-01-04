@@ -40,6 +40,7 @@ pygame.init()
 screen = pygame.display.set_mode(size)
 clock = pygame.time.Clock()
 falling = False
+all_sprites = pygame.sprite.Group()
 
 player = None
 
@@ -72,7 +73,7 @@ class Knight(pygame.sprite.Sprite):
             else:
                 screen.blit(pygame.transform.flip(knight_img[img_count // 5], True, False), (self.rect.x, self.rect.y))
         img_count += 1
-        clock.tick(100)
+        clock.tick(60)
 
     def jumping(self, vector):
         global jump_count, is_jump
@@ -110,6 +111,17 @@ class Knight(pygame.sprite.Sprite):
 
 action = False
 
+class Ball(pygame.sprite.Sprite):
+    def __init__(self, radius, x, y):
+        super().__init__(all_sprites)
+        self.radius = radius
+        self.image = pygame.Surface((2 * radius, 2 * radius),
+                                    pygame.SRCALPHA, 32)
+        pygame.draw.circle(self.image, pygame.Color("red"),
+                           (radius, radius), radius)
+        self.rect = pygame.Rect(x, y, 2 * radius, 2 * radius)
+
+
 # группы спрайтов
 def main():
     global is_jump, action, check_of_fall, check_of_fall_2, check_of_fall_3, falling
@@ -122,20 +134,21 @@ def main():
     screen.blit(fon, (0, 0))
     running = True
     vector = False
+    Ball(10, 50, 50)
     while running:
         action = False
+        screen.blit(fon, (0, 0))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        screen.blit(fon, (0, 0))
-        if ((knight.rect.x < 125 and knight.rect.y != 170) or (knight.rect.x < 255 and knight.rect.y != 170 and 50 < knight.rect.y < 170)) and check_of_fall:
+        if ((knight.rect.x < 125 and knight.rect.y != 170) or (knight.rect.x < 255 and knight.rect.y != 170 and 50 < knight.rect.y < 170)) and check_of_fall and knight.rect.y >= 50:
             knight.rect.y += 10
             clock.tick(60)
             falling = True
         if knight.rect.y == 170:
             check_of_fall = False
             falling = False
-        if ((knight.rect.x > 690 and knight.rect.y > 50 and knight.rect.y != 290) or (knight.rect.x > 600 and knight.rect.y > 50 and knight.rect.y != 290 and 170 < knight.rect.y < 290)) and check_of_fall_2:
+        if ((knight.rect.x > 690 and knight.rect.y > 50 and knight.rect.y != 290) or (knight.rect.x > 600 and knight.rect.y > 50 and knight.rect.y != 290 and 170 < knight.rect.y < 290)) and check_of_fall_2 and knight.rect.y >= 170:
             knight.rect.y += 10
             clock.tick(60)
             falling = True
@@ -143,9 +156,9 @@ def main():
             check_of_fall_2 = False
             falling = False
             knight.rect.y -= 5
-        if (knight.rect.x < 130 and knight.rect.y != 405 and 285 <= knight.rect.y) and check_of_fall_3:
+        if ((knight.rect.x < 130 and knight.rect.y != 405 and 285 <= knight.rect.y) or (knight.rect.x < 200 and knight.rect.y != 405 and 285 <= knight.rect.y and 285 < knight.rect.y < 405)) and check_of_fall_3 and knight.rect.y >= 285:
             knight.rect.y += 10
-            clock.tick(45)
+            clock.tick(60)
             falling = True
         if knight.rect.y == 405:
             check_of_fall_3 = False
@@ -170,6 +183,7 @@ def main():
             Knight.jumping(knight, vector)
         if not action and not is_jump:
             Knight.staying(knight, vector)
+        all_sprites.draw(screen)
         pygame.display.flip()
     pygame.quit()
 
