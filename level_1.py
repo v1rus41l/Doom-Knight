@@ -32,6 +32,7 @@ check_of_fall = True
 check_of_fall_2 = True
 check_of_fall_3 = True
 
+
 # FPS = 50
 
 size = width, height = 500, 500
@@ -41,6 +42,7 @@ clock = pygame.time.Clock()
 falling = False
 
 player = None
+
 
 class Knight(pygame.sprite.Sprite):
     image = load_image("1.png")
@@ -150,20 +152,18 @@ def main():
             falling = False
             knight.rect.y -= 5
         if pygame.key.get_pressed()[pygame.K_RIGHT] or pygame.key.get_pressed()[pygame.K_LEFT]:
-            # if knight.rect.x < 120 and knight.rect.y == 50:
-            #     for i in range(60):
-            #         knight.rect.y += 2
-            #         clock.tick(60)
             if pygame.key.get_pressed()[pygame.K_RIGHT]:
-                knight.rect.x += 3
-                vector = True
-                Knight.animation(knight, vector)
-                action = True
+                if knight.rect.x <= 800:
+                    knight.rect.x += 3
+                    vector = True
+                    Knight.animation(knight, vector)
+                    action = True
             if pygame.key.get_pressed()[pygame.K_LEFT]:
-                knight.rect.x -= 3
-                vector = False
-                Knight.animation(knight, vector)
-                action = True
+                if knight.rect.x >= 0:
+                    knight.rect.x -= 3
+                    vector = False
+                    Knight.animation(knight, vector)
+                    action = True
         if pygame.key.get_pressed()[pygame.K_UP] and not falling:
             is_jump = True
         if is_jump:
