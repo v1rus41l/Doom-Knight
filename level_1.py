@@ -26,8 +26,11 @@ knight_img = [pygame.image.load('data/3.png'),
               pygame.image.load('data/4.png'), pygame.image.load('data/5.png'), pygame.image.load('data/6.png'),
               pygame.image.load('data/5.png'), pygame.image.load('data/4.png')]
 img_count = 0
+jump_count = 10
+is_jump = False
+check_of_fall = True
 
-FPS = 50
+# FPS = 50
 
 size = width, height = 500, 500
 pygame.init()
@@ -55,35 +58,61 @@ class Knight(pygame.sprite.Sprite):
             screen.blit(pygame.transform.flip(pygame.image.load('data/1.png'), True, False), (self.rect.x, self.rect.y))
 
     def animation(self, vector):
-        global img_count
+        global img_count, is_jump
         if img_count == 30:
             img_count = 0
-        if vector:
-            screen.blit(knight_img[img_count // 5], (self.rect.x, self.rect.y))
-        else:
-            screen.blit(pygame.transform.flip(knight_img[img_count // 5], True, False), (self.rect.x, self.rect.y))
+        if not is_jump:
+            if vector:
+                screen.blit(knight_img[img_count // 5], (self.rect.x, self.rect.y))
+            else:
+                screen.blit(pygame.transform.flip(knight_img[img_count // 5], True, False), (self.rect.x, self.rect.y))
         img_count += 1
-        clock.tick(80)
+        clock.tick(100)
 
-    def jumping(self):
-        self.rect.y -= 5 * clock.tick(60)
-        self.rect.y += 15 * clock.tick(60)
+    def jumping(self, vector):
+        global jump_count, is_jump
+        if vector:
+            screen.blit(pygame.image.load('data/2.png'), (self.rect.x, self.rect.y))
+        else:
+            screen.blit(pygame.transform.flip(pygame.image.load('data/2.png'), True, False), (self.rect.x, self.rect.y))
+        if jump_count >= -10:
+            self.rect.y -= jump_count
+            jump_count -= 1
+            clock.tick(60)
+        else:
+            jump_count = 10
+            clock.tick(60)
+            is_jump = False
+
+
+        # print(jump_count)
+        # if not is_jump:
+        #     jump_count -= 1
+        #     self.rect.y += 10
+        #     clock.tick(30)
+        #     print(11)
+        #     if jump_count == 0:
+        #         is_jump = True
+        # if is_jump:
+        #     jump_count += 1
+        #     self.rect.y -= 10
+        #     clock.tick(30)
+        #     if jump_count == 2:
+        #         print(1)
+        #         is_jump = False
 
 
 
+action = False
 
 # группы спрайтов
 def main():
+    global is_jump, action, check_of_fall
     pygame.init()
     size = width, height = 850, 450
     screen = pygame.display.set_mode(size)
     all_sprites = pygame.sprite.Group()
     knight = Knight()
-    arrow_image = load_image("1.png")
-    arrow_image = pygame.transform.scale(arrow_image, (100, 100))
-    cursor = pygame.sprite.Sprite(all_sprites)
-    cursor.image = arrow_image
-    cursor.rect = cursor.image.get_rect()
     fon = pygame.transform.scale(load_image('level1_fon.jpg'), (width, height))
     screen.blit(fon, (0, 0))
     running = True
@@ -94,22 +123,32 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
         screen.blit(fon, (0, 0))
-        if pygame.key.get_pressed()[pygame.K_RIGHT]:
-            knight.rect.x += 2
-            vector = True
-            Knight.animation(knight, vector)
-            action = True
-        if pygame.key.get_pressed()[pygame.K_LEFT]:
-            knight.rect.x -= 2
-            vector = False
-            Knight.animation(knight, vector)
-            action = True
+        if knight.rect.x < 125 and knight.rect.y != 170 and check_of_fall:
+            knight.rect.y += 10
+            clock.tick(45)
+        if knight.rect.y == 170:
+            check_of_fall = False
+        if pygame.key.get_pressed()[pygame.K_RIGHT] or pygame.key.get_pressed()[pygame.K_LEFT]:
+            # if knight.rect.x < 120 and knight.rect.y == 50:
+            #     for i in range(60):
+            #         knight.rect.y += 2
+            #         clock.tick(60)
+            if pygame.key.get_pressed()[pygame.K_RIGHT]:
+                knight.rect.x += 3
+                vector = True
+                Knight.animation(knight, vector)
+                action = True
+            if pygame.key.get_pressed()[pygame.K_LEFT]:
+                knight.rect.x -= 3
+                vector = False
+                Knight.animation(knight, vector)
+                action = True
         if pygame.key.get_pressed()[pygame.K_UP]:
-            Knight.jumping(knight)
-        if not action:
+            is_jump = True
+        if is_jump:
+            Knight.jumping(knight, vector)
+        if not action and not is_jump:
             Knight.staying(knight, vector)
-        # screen.blit(pygame.image.load('data/1.png'), (0, 0))
-        # all_sprites.draw(screen)
         pygame.display.flip()
     pygame.quit()
 
