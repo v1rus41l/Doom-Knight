@@ -26,6 +26,9 @@ knight_img = [pygame.image.load('data/3.png'),
               pygame.image.load('data/4.png'), pygame.image.load('data/5.png'), pygame.image.load('data/6.png'),
               pygame.image.load('data/5.png'), pygame.image.load('data/4.png')]
 skeleton_img = [pygame.image.load('data/skeleton1.png'), pygame.image.load('data/skeleton2.png')]
+woodcutter_image = [pygame.image.load('data/woodcutter1.png'), pygame.image.load('data/woodcutter2.png'),
+                    pygame.image.load('data/woodcutter3.png'), pygame.image.load('data/woodcutter2.png'),
+                    pygame.image.load('data/woodcutter1.png')]
 
 img_count = 0
 jump_count = 10
@@ -49,6 +52,9 @@ player = None
 running = True
 score = 0
 vector = False
+jump_count_wc = 10
+woodcutter_count = 10
+
 
 
 class Knight(pygame.sprite.Sprite):
@@ -177,7 +183,83 @@ class Skeleton(pygame.sprite.Sprite):
 
 
 
+class WoodCutter(pygame.sprite.Sprite):
+    global action
+    image = load_image("woodcutter1.png")
 
+    def __init__(self, x1, x2, pos_x, pos_y):
+        # НЕОБХОДИМО вызвать конструктор родительского класса Sprite.
+        # Это очень важно!!!
+        super().__init__(skeleton_group)
+        self.image = Skeleton.image
+        self.rect = self.image.get_rect()
+        self.rect.x = pos_x
+        self.rect.y = pos_y
+        self.x1 = x1
+        self.x2 = x2
+        self.check = True
+        self.count = 0
+        self.checking_jump = True
+        self.mask = pygame.mask.from_surface(self.image)
+        self.clock = pygame.time.Clock()
+        self.vector = False
+
+
+    def update(self, knight):
+        global running
+        if pygame.sprite.collide_mask(self, knight):
+            running = False
+
+
+    def running(self):
+        global action
+        if self.rect.x >= self.x2:
+            self.check = True
+            self.vector = False
+        if self.rect.x <= self.x1:
+            self.check = False
+            self.vector = True
+        if self.check:
+            if action:
+                self.rect.x -= 2
+            else:
+                self.rect.x -= 1
+        else:
+            if action:
+                self.rect.x += 2
+            else:
+                self.rect.x += 1
+        clock.tick(300)
+
+    def animation(self):
+        global woodcutter_count, woodcutter_image
+        if woodcutter_count == 30:
+            woodcutter_count = 0
+        if self.vector:
+            screen.blit(woodcutter_image[woodcutter_count // 10], (self.rect.x, self.rect.y))
+        else:
+            screen.blit(pygame.transform.flip(woodcutter_image[woodcutter_count // 15], True, False), (self.rect.x, self.rect.y))
+        woodcutter_count += 1
+        clock.tick(300)
+
+
+    def jumping(self):
+        global jump_count_wc
+        if self.count == 30:
+            woodcutter_is_jump = True
+            self.checking_jump = False
+            if jump_count_wc >= -10:
+                self.rect.y -= jump_count_wc
+                jump_count_wc -= 1
+                clock.tick(300)
+            else:
+                jump_count_wc = 10
+                clock.tick(300)
+                self.count = 0
+                self.checking_jump = True
+                woodcutter_is_jump = False
+        if self.checking_jump:
+            self.count += 1
 
 
 def main():
@@ -296,13 +378,40 @@ def lvl_2():
     screen = pygame.display.set_mode(size)
     fon = pygame.transform.scale(load_image('level2_fon.jpg'), (width, height))
     screen.blit(fon, (0, 0))
-    knight = Knight(100, 60)
+    knight = Knight(30, 290)
     skeleton1 = Skeleton(20, 580, 580, 75)
     skeleton_group.add(skeleton1)
     skeleton2 = Skeleton(336, 804, 804, 305)
     skeleton_group.add(skeleton2)
+    woodcutter = WoodCutter(100, 696, 100, 195)
+    woodcutter2 = WoodCutter(35, 815, 35, 415)
+    pos_x = 30
+    for i in range(9):
+        ball = Ball(3, pos_x, 85)
+        all_sprites.add(ball)
+        pos_x += 70
+    pos_x = 120
+    for i in range(10):
+        ball = Ball(3, pos_x, 205)
+        all_sprites.add(ball)
+        pos_x += 65
+    pos_x = 800
+    # for i in range(7):
+    #     ball = Ball(3, pos_x, 320)
+    #     all_sprites.add(ball)
+    #     pos_x -= 70
+    pos_x = 30
+    for i in range(14):
+        ball = Ball(3, pos_x, 320)
+        all_sprites.add(ball)
+        pos_x += 70
+    pos_x = 30
+    for i in range(11):
+        ball = Ball(3, pos_x, 430)
+        all_sprites.add(ball)
+        pos_x += 70
     while running:
-        print(knight.rect.x, knight.rect.y)
+        # print(knight.rect.x, knight.rect.y)
         right_running = False
         left_running = False
         action = False
@@ -324,8 +433,8 @@ def lvl_2():
         if knight.rect.y == 290:
             check_of_fall_22 = False
             falling = False
-        if ((278 < knight.rect.x < 312 and 290 <= knight.rect.y < 400) or (200 < knight.rect.x < 400 and 290 <= knight.rect.y < 400 and falling)) and check_of_fall_23:
-            print(1)
+        if ((278 < knight.rect.x < 315 and 290 <= knight.rect.y < 400) or (200 < knight.rect.x < 400 and 290 <= knight.rect.y < 400 and falling)) and check_of_fall_23:
+
             knight.rect.y += 10
             clock.tick(70)
             falling = True
@@ -336,14 +445,14 @@ def lvl_2():
             if pygame.key.get_pressed()[pygame.K_RIGHT]:
                 if knight.rect.x <= 800 and not left_running:
                     right_running = True
-                    knight.rect.x += 4
+                    knight.rect.x += 5
                     vector = True
                     Knight.animation(knight, vector)
                     action = True
             if pygame.key.get_pressed()[pygame.K_LEFT]:
                 if knight.rect.x >= 0 and not right_running:
                     left_running = True
-                    knight.rect.x -= 4
+                    knight.rect.x -= 5
                     vector = False
                     Knight.animation(knight, vector)
                     action = True
@@ -356,6 +465,14 @@ def lvl_2():
             Knight.jumping(knight, vector)
         if not action and not is_jump:
             Knight.staying(knight, vector)
+        all_sprites.update(knight)
+        all_sprites.draw(screen)
+        WoodCutter.running(woodcutter2)
+        WoodCutter.animation(woodcutter2)
+        WoodCutter.jumping(woodcutter2)
+        WoodCutter.running(woodcutter)
+        WoodCutter.animation(woodcutter)
+        WoodCutter.jumping(woodcutter)
         skeleton_group.update(knight)
         Skeleton.running(skeleton1)
         Skeleton.animation(skeleton1)
