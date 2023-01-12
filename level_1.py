@@ -39,6 +39,9 @@ check_of_fall_13 = True
 check_of_fall2 = True
 check_of_fall_22 = True
 check_of_fall_23 = True
+check_of_fall3 = True
+check_of_fall_32 = True
+check_of_fall_33 = True
 skeleton_count = 10
 size = width, height = 500, 500
 pygame.init()
@@ -262,6 +265,30 @@ class WoodCutter(pygame.sprite.Sprite):
             self.count += 1
 
 
+class Sphere(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(all_sprites)
+        self.radius = 5
+        self.image = pygame.Surface((2 * 5, 2 * 5),
+                                    pygame.SRCALPHA, 32)
+        pygame.draw.circle(self.image, pygame.Color("white"),
+                           (5, 5), 5)
+        self.rect = pygame.Rect(10, 170, 2 * 5, 2 * 5)
+        self.mask = pygame.mask.from_surface(self.image)
+
+
+    def actioning(self):
+        self.rect.x += 1
+        clock.tick(60)
+        if self.rect.x > 850:
+            self.kill()
+
+    def update(self, knight):
+        global running
+        if pygame.sprite.collide_mask(self, knight):
+            running = False
+
+
 def main():
     global is_jump, action, check_of_fall1, check_of_fall_12, check_of_fall_13, falling, running, score, knight, vector
     pygame.init()
@@ -481,6 +508,80 @@ def lvl_2():
         pygame.display.flip()
 
 
+def lvl_3():
+    global running, WIDTH, HEIGHT, vector, is_jump, check_of_fall2, check_of_fall_22, check_of_fall_23, falling, skeleton_group, check_of_fall3, check_of_fall_32, check_of_fall_33
+    pygame.init()
+    vector = True
+    action = False
+    size = width, height = 850, 450
+    screen = pygame.display.set_mode(size)
+    fon = pygame.transform.scale(load_image('level3_fon.jpg'), (width, height))
+    knight = Knight(40, 290)
+    sphere = Sphere()
+    screen.blit(fon, (0, 0))
+    all_sprites.add(sphere)
+    while running:
+        # print(knight.rect.x, knight.rect.y)
+        print(sphere.rect.x)
+        right_running = False
+        left_running = False
+        action = False
+        screen.blit(fon, (0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        if ((112 < knight.rect.x < 152 and 60 <= knight.rect.y < 180) or (60 < knight.rect.x < 200 and 60 <= knight.rect.y < 180 and falling)) and check_of_fall3:
+            knight.rect.y += 10
+            clock.tick(70)
+            falling = True
+        if knight.rect.y == 180:
+            check_of_fall3 = False
+            falling = False
+        if ((knight.rect.x > 732 and 180 <= knight.rect.y < 290) or (knight.rect.x > 600 and 180 <= knight.rect.y < 290 and falling)) and check_of_fall_32:
+            knight.rect.y += 10
+            clock.tick(70)
+            falling = True
+        if knight.rect.y == 290:
+            check_of_fall_32 = False
+            falling = False
+        if ((98 < knight.rect.x < 143 and 290 <= knight.rect.y < 400) or (0 < knight.rect.x < 250 and 290 <= knight.rect.y < 400 and falling)) and check_of_fall_33:
+            knight.rect.y += 10
+            clock.tick(70)
+            falling = True
+        if knight.rect.y == 400:
+            check_of_fall_33 = False
+            falling = False
+            knight.rect.y -= 5
+        if pygame.key.get_pressed()[pygame.K_RIGHT] or pygame.key.get_pressed()[pygame.K_LEFT]:
+            if pygame.key.get_pressed()[pygame.K_RIGHT]:
+                if knight.rect.x <= 800 and not left_running:
+                    right_running = True
+                    knight.rect.x += 3
+                    vector = True
+                    Knight.animation(knight, vector)
+                    action = True
+            if pygame.key.get_pressed()[pygame.K_LEFT]:
+                if knight.rect.x >= 0 and not right_running:
+                    if not (knight.rect.x <= 32 and 70 < knight.rect.y <= 180) and not (knight.rect.x <= 32 and 190 < knight.rect.y <= 290):
+                        left_running = True
+                        knight.rect.x -= 3
+                        vector = False
+                        Knight.animation(knight, vector)
+                        action = True
+        if pygame.key.get_pressed()[pygame.K_UP] and not falling:
+            if 760 < knight.rect.x < 790 and knight.rect.y == 400:
+                running = False
+            else:
+                is_jump = True
+        if is_jump:
+            Knight.jumping(knight, vector)
+        if not action and not is_jump:
+            Knight.staying(knight, vector)
+        pygame.display.flip()
+        Sphere.actioning(sphere)
+        all_sprites.draw(screen)
+
+
 
 if __name__ == '__main__':
-    lvl_2()
+    lvl_3()
