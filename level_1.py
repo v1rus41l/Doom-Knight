@@ -108,25 +108,6 @@ class Knight(pygame.sprite.Sprite):
 
 
 
-
-class Ball(pygame.sprite.Sprite):
-    def __init__(self, radius, x, y):
-        super().__init__(all_sprites)
-        self.radius = radius
-        self.image = pygame.Surface((2 * radius, 2 * radius),
-                                    pygame.SRCALPHA, 32)
-        pygame.draw.circle(self.image, pygame.Color("white"),
-                           (radius, radius), radius)
-        self.rect = pygame.Rect(x, y, 2 * radius, 2 * radius)
-        self.mask = pygame.mask.from_surface(self.image)
-
-    def update(self, knight):
-        global score
-        if pygame.sprite.collide_mask(self, knight):
-            self.kill()
-            score += 10
-
-
 class Skeleton(pygame.sprite.Sprite):
     global action
     image = load_image("skeleton1.png")
@@ -265,23 +246,48 @@ class WoodCutter(pygame.sprite.Sprite):
             self.count += 1
 
 
+class Ball(pygame.sprite.Sprite):
+    def __init__(self, radius, x, y):
+        super().__init__(all_sprites)
+        self.radius = radius
+        self.image = pygame.Surface((2 * radius, 2 * radius),
+                                    pygame.SRCALPHA, 32)
+        pygame.draw.circle(self.image, pygame.Color("white"),
+                           (radius, radius), radius)
+        self.rect = pygame.Rect(x, y, 2 * radius, 2 * radius)
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def update(self, knight):
+        global score
+        if pygame.sprite.collide_mask(self, knight):
+            self.kill()
+            score += 10
+
+
 class Sphere(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, x, y):
         super().__init__(all_sprites)
         self.radius = 5
         self.image = pygame.Surface((2 * 5, 2 * 5),
                                     pygame.SRCALPHA, 32)
         pygame.draw.circle(self.image, pygame.Color("white"),
                            (5, 5), 5)
-        self.rect = pygame.Rect(10, 170, 2 * 5, 2 * 5)
+        self.rect = pygame.Rect(x, y, 2 * 5, 2 * 5)
         self.mask = pygame.mask.from_surface(self.image)
+        self.x = x
 
 
     def actioning(self):
-        self.rect.x += 1
-        clock.tick(60)
+        global action
+        if action:
+            self.rect.x += 10
+            clock.tick(200)
+        else:
+            self.rect.x += 3
+        clock.tick(150)
         if self.rect.x > 850:
-            self.kill()
+            self.rect.x = self.x
+
 
     def update(self, knight):
         global running
@@ -516,10 +522,12 @@ def lvl_3():
     size = width, height = 850, 450
     screen = pygame.display.set_mode(size)
     fon = pygame.transform.scale(load_image('level3_fon.jpg'), (width, height))
-    knight = Knight(40, 290)
-    sphere = Sphere()
+    knight = Knight(40, 60)
+    sphere = Sphere(40, 196)
+    sphere2 = Sphere(40, 305)
     screen.blit(fon, (0, 0))
-    all_sprites.add(sphere)
+    all_sprites.add(sphere, sphere2)
+    knight.kill()
     while running:
         # print(knight.rect.x, knight.rect.y)
         print(sphere.rect.x)
@@ -577,9 +585,12 @@ def lvl_3():
             Knight.jumping(knight, vector)
         if not action and not is_jump:
             Knight.staying(knight, vector)
-        pygame.display.flip()
         Sphere.actioning(sphere)
+        Sphere.actioning(sphere2)
+        Sphere.update(sphere, knight)
+        Sphere.update(sphere2, knight)
         all_sprites.draw(screen)
+        pygame.display.flip()
 
 
 
