@@ -57,6 +57,7 @@ score = 0
 vector = False
 jump_count_wc = 10
 woodcutter_count = 10
+locking = True
 
 
 
@@ -264,14 +265,48 @@ class Ball(pygame.sprite.Sprite):
             score += 10
 
 
-class Sphere(pygame.sprite.Sprite):
+class GoldenKey(pygame.sprite.Sprite):
+    image = load_image("goldenkey.png")
     def __init__(self, x, y):
         super().__init__(all_sprites)
         self.radius = 5
-        self.image = pygame.Surface((2 * 5, 2 * 5),
-                                    pygame.SRCALPHA, 32)
-        pygame.draw.circle(self.image, pygame.Color("white"),
-                           (5, 5), 5)
+        self.image = load_image("goldenkey.png")
+
+        self.rect = pygame.Rect(x, y, 250, 250)
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def update(self, knight):
+        global locking
+        if pygame.sprite.collide_mask(self, knight):
+            self.kill()
+            locking = False
+
+
+class Lock(pygame.sprite.Sprite):
+    image = load_image("lock.png")
+    def __init__(self, x, y):
+        super().__init__(all_sprites)
+        self.radius = 5
+        self.image = load_image("lock.png")
+
+        self.rect = pygame.Rect(x, y, 250, 250)
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def unlocking(self):
+        global locking
+        if not locking:
+            self.kill()
+
+
+
+class Sphere(pygame.sprite.Sprite):
+    image = load_image("Volume_045.png")
+
+    def __init__(self, x, y):
+        super().__init__(all_sprites)
+        self.radius = 5
+        self.image = load_image("Volume_045.png")
+
         self.rect = pygame.Rect(x, y, 2 * 5, 2 * 5)
         self.mask = pygame.mask.from_surface(self.image)
         self.x = x
@@ -279,12 +314,8 @@ class Sphere(pygame.sprite.Sprite):
 
     def actioning(self):
         global action
-        if action:
-            self.rect.x += 10
-            clock.tick(200)
-        else:
-            self.rect.x += 3
-        clock.tick(150)
+        self.rect.x += 10
+        clock.tick(300)
         if self.rect.x > 850:
             self.rect.x = self.x
 
@@ -411,7 +442,7 @@ def lvl_2():
     screen = pygame.display.set_mode(size)
     fon = pygame.transform.scale(load_image('level2_fon.jpg'), (width, height))
     screen.blit(fon, (0, 0))
-    knight = Knight(30, 290)
+    knight = Knight(30, 60)
     skeleton1 = Skeleton(20, 580, 580, 75)
     skeleton_group.add(skeleton1)
     skeleton2 = Skeleton(336, 804, 804, 305)
@@ -428,11 +459,6 @@ def lvl_2():
         ball = Ball(3, pos_x, 205)
         all_sprites.add(ball)
         pos_x += 65
-    pos_x = 800
-    # for i in range(7):
-    #     ball = Ball(3, pos_x, 320)
-    #     all_sprites.add(ball)
-    #     pos_x -= 70
     pos_x = 30
     for i in range(14):
         ball = Ball(3, pos_x, 320)
@@ -515,7 +541,7 @@ def lvl_2():
 
 
 def lvl_3():
-    global running, WIDTH, HEIGHT, vector, is_jump, check_of_fall2, check_of_fall_22, check_of_fall_23, falling, skeleton_group, check_of_fall3, check_of_fall_32, check_of_fall_33
+    global running, WIDTH, HEIGHT, vector, is_jump, check_of_fall2, check_of_fall_22, check_of_fall_23, falling, skeleton_group, check_of_fall3, check_of_fall_32, check_of_fall_33, locking
     pygame.init()
     vector = True
     action = False
@@ -523,14 +549,40 @@ def lvl_3():
     screen = pygame.display.set_mode(size)
     fon = pygame.transform.scale(load_image('level3_fon.jpg'), (width, height))
     knight = Knight(40, 60)
-    sphere = Sphere(40, 196)
-    sphere2 = Sphere(40, 305)
+    sphere = Sphere(35, 191)
+    sphere2 = Sphere(35, 300)
     screen.blit(fon, (0, 0))
-    all_sprites.add(sphere, sphere2)
-    knight.kill()
+    woodcutter = WoodCutter(169, 825, 169, 75)
+    woodcutter2 = WoodCutter(40, 820, 40, 415)
+    skeleton = Skeleton(40, 710, 40, 195)
+    skeleton2 = Skeleton(172, 825, 172, 305)
+    skeleton_group.add(woodcutter, skeleton, skeleton2, woodcutter2)
+    key = GoldenKey(785, 50)
+    lock = Lock(788, 393)
+    all_sprites.add(sphere, sphere2, key, lock)
+    pos_x = 200
+    for i in range(9):
+        ball = Ball(3, pos_x, 85)
+        all_sprites.add(ball)
+        pos_x += 70
+    pos_x = 55
+    for i in range(11):
+        ball = Ball(3, pos_x, 205)
+        all_sprites.add(ball)
+        pos_x += 65
+    pos_x = 60
+    for i in range(14):
+        ball = Ball(3, pos_x, 320)
+        all_sprites.add(ball)
+        pos_x += 70
+    pos_x = 30
+    for i in range(11):
+        ball = Ball(3, pos_x, 430)
+        all_sprites.add(ball)
+        pos_x += 70
     while running:
-        # print(knight.rect.x, knight.rect.y)
-        print(sphere.rect.x)
+        print(knight.rect.x, knight.rect.y)
+        # print(sphere.rect.x)
         right_running = False
         left_running = False
         action = False
@@ -560,36 +612,51 @@ def lvl_3():
             check_of_fall_33 = False
             falling = False
             knight.rect.y -= 5
-        if pygame.key.get_pressed()[pygame.K_RIGHT] or pygame.key.get_pressed()[pygame.K_LEFT]:
-            if pygame.key.get_pressed()[pygame.K_RIGHT]:
-                if knight.rect.x <= 800 and not left_running:
-                    right_running = True
-                    knight.rect.x += 3
-                    vector = True
+        if pygame.key.get_pressed()[pygame.K_RIGHT]:
+            if knight.rect.x <= 800 and not left_running:
+                right_running = True
+                knight.rect.x += 9
+                vector = True
+                Knight.animation(knight, vector)
+                action = True
+        if pygame.key.get_pressed()[pygame.K_LEFT]:
+            if knight.rect.x >= 0 and not right_running:
+                if not (knight.rect.x <= 32 and 70 < knight.rect.y <= 180) and not (knight.rect.x <= 32 and 190 < knight.rect.y <= 290):
+                    left_running = True
+                    knight.rect.x -= 9
+                    vector = False
                     Knight.animation(knight, vector)
                     action = True
-            if pygame.key.get_pressed()[pygame.K_LEFT]:
-                if knight.rect.x >= 0 and not right_running:
-                    if not (knight.rect.x <= 32 and 70 < knight.rect.y <= 180) and not (knight.rect.x <= 32 and 190 < knight.rect.y <= 290):
-                        left_running = True
-                        knight.rect.x -= 3
-                        vector = False
-                        Knight.animation(knight, vector)
-                        action = True
         if pygame.key.get_pressed()[pygame.K_UP] and not falling:
-            if 760 < knight.rect.x < 790 and knight.rect.y == 400:
-                running = False
+            if 760 < knight.rect.x < 790 and knight.rect.y == 395:
+                if locking:
+                    pass
+                else:
+                    running = False
             else:
                 is_jump = True
         if is_jump:
             Knight.jumping(knight, vector)
         if not action and not is_jump:
             Knight.staying(knight, vector)
+        Lock.unlocking(lock)
         Sphere.actioning(sphere)
         Sphere.actioning(sphere2)
         Sphere.update(sphere, knight)
         Sphere.update(sphere2, knight)
+        WoodCutter.running(woodcutter)
+        WoodCutter.animation(woodcutter)
+        WoodCutter.jumping(woodcutter)
+        WoodCutter.running(woodcutter2)
+        WoodCutter.animation(woodcutter2)
+        WoodCutter.jumping(woodcutter2)
+        Skeleton.running(skeleton)
+        Skeleton.animation(skeleton)
+        Skeleton.running(skeleton2)
+        Skeleton.animation(skeleton2)
         all_sprites.draw(screen)
+        all_sprites.update(knight)
+        skeleton_group.update(knight)
         pygame.display.flip()
 
 
