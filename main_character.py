@@ -3,7 +3,7 @@ import random
 import sys
 
 import pygame
-from level_1 import  img_count
+from game import  img_count
 
 
 def load_image(name, colorkey=None):

@@ -1,6 +1,6 @@
 import os
 import sys
-
+import csv
 import pygame
 
 
@@ -341,25 +341,29 @@ def main():
     skeleton_group.add(skeleton)
     skeleton2 = Skeleton(200, 840, 840, 300)
     skeleton_group.add(skeleton2)
-    for i in range(9):
-        ball = Ball(3, pos_x, 70)
-        all_sprites.add(ball)
-        pos_x -= 70
-    pos_x = 30
-    for i in range(10):
-        ball = Ball(3, pos_x, 190)
-        all_sprites.add(ball)
-        pos_x += 70
-    pos_x = 820
-    for i in range(10):
-        ball = Ball(3, pos_x, 305)
-        all_sprites.add(ball)
-        pos_x -= 70
-    pos_x = 30
-    for i in range(11):
-        ball = Ball(3, pos_x, 425)
-        all_sprites.add(ball)
-        pos_x += 70
+    score = 0
+    with open('points.csv', encoding="utf8") as csvfile:
+        reader = csv.reader(csvfile, delimiter=';', quotechar='"')
+
+        for i in range(9):
+            ball = Ball(3, pos_x, 70)
+            all_sprites.add(ball)
+            pos_x -= 70
+        pos_x = 30
+        for i in range(10):
+            ball = Ball(3, pos_x, 190)
+            all_sprites.add(ball)
+            pos_x += 70
+        pos_x = 820
+        for i in range(10):
+            ball = Ball(3, pos_x, 305)
+            all_sprites.add(ball)
+            pos_x -= 70
+        pos_x = 30
+        for i in range(11):
+            ball = Ball(3, pos_x, 425)
+            all_sprites.add(ball)
+            pos_x += 70
     while running:
         right_running = False
         left_running = False
@@ -434,7 +438,7 @@ def main():
 
 
 def lvl_2():
-    global running, WIDTH, HEIGHT, vector, is_jump, check_of_fall2, check_of_fall_22, check_of_fall_23, falling, skeleton_group
+    global running, WIDTH, HEIGHT, vector, is_jump, check_of_fall2, check_of_fall_22, check_of_fall_23, falling, skeleton_group, score
     pygame.init()
     vector = True
     action = False
@@ -449,6 +453,7 @@ def lvl_2():
     skeleton_group.add(skeleton2)
     woodcutter = WoodCutter(100, 696, 100, 195)
     woodcutter2 = WoodCutter(35, 815, 35, 415)
+    score = 0
     pos_x = 30
     for i in range(9):
         ball = Ball(3, pos_x, 85)
@@ -524,6 +529,13 @@ def lvl_2():
             Knight.jumping(knight, vector)
         if not action and not is_jump:
             Knight.staying(knight, vector)
+        intro_text = f'Очки: {score}'
+        font = pygame.font.Font(None, 40)
+        string_rendered = font.render(intro_text, 1, pygame.Color('white'))
+        intro_rect = string_rendered.get_rect()
+        intro_rect.x = 700
+        intro_rect.y = 5
+        screen.blit(string_rendered, intro_rect)
         all_sprites.update(knight)
         all_sprites.draw(screen)
         WoodCutter.running(woodcutter2)
@@ -541,10 +553,11 @@ def lvl_2():
 
 
 def lvl_3():
-    global running, WIDTH, HEIGHT, vector, is_jump, check_of_fall2, check_of_fall_22, check_of_fall_23, falling, skeleton_group, check_of_fall3, check_of_fall_32, check_of_fall_33, locking
+    global running, WIDTH, HEIGHT, vector, is_jump, score, check_of_fall2, check_of_fall_22, check_of_fall_23, falling, skeleton_group, check_of_fall3, check_of_fall_32, check_of_fall_33, locking
     pygame.init()
     vector = True
     action = False
+    score = 0
     size = width, height = 850, 450
     screen = pygame.display.set_mode(size)
     fon = pygame.transform.scale(load_image('level3_fon.jpg'), (width, height))
@@ -639,6 +652,13 @@ def lvl_3():
             Knight.jumping(knight, vector)
         if not action and not is_jump:
             Knight.staying(knight, vector)
+        intro_text = f'Очки: {score}'
+        font = pygame.font.Font(None, 40)
+        string_rendered = font.render(intro_text, 1, pygame.Color('white'))
+        intro_rect = string_rendered.get_rect()
+        intro_rect.x = 700
+        intro_rect.y = 5
+        screen.blit(string_rendered, intro_rect)
         Lock.unlocking(lock)
         Sphere.actioning(sphere)
         Sphere.actioning(sphere2)
@@ -662,4 +682,4 @@ def lvl_3():
 
 
 if __name__ == '__main__':
-    lvl_3()
+    main()

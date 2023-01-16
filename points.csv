@@ -1,0 +1,4 @@
+level;number_of_cycle;pos_x;pos_y;step;count;number_of_cycle;pos_x;pos_y;step;count;number_of_cycle;pos_x;pos_y;step;count;number_of_cycle;pos_x;pos_y;step;count
+1;1;750;70;70;9;2;30;190;70;10;3;820;305;70;10;4;30;425;70;11
+2;1;30;85;70;9;2;120;205;65;10;3;30;320;70;14;4;30;430;70;11
+3;1;200;85;70;9;2;55;205;65;11;3;60;320;70;14;4;30;430;70;11
