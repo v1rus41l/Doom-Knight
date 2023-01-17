@@ -336,34 +336,34 @@ def main():
     skeleton_group = pygame.sprite.Group()
     fon = pygame.transform.scale(load_image('level1_fon.jpg'), (width, height))
     screen.blit(fon, (0, 0))
-    pos_x = 750
     skeleton = Skeleton(5, 680, 5, 185)
     skeleton_group.add(skeleton)
     skeleton2 = Skeleton(200, 840, 840, 300)
     skeleton_group.add(skeleton2)
     score = 0
     with open('points.csv', encoding="utf8") as csvfile:
-        reader = csv.reader(csvfile, delimiter=';', quotechar='"')
-
-        for i in range(9):
-            ball = Ball(3, pos_x, 70)
+        reader = list(csv.reader(csvfile, delimiter=';', quotechar='"'))[1:]
+        for_level1 = list(map(int, reader[0]))
+        pos_x = for_level1[2]
+        for i in range(for_level1[5]):
+            ball = Ball(3, pos_x, for_level1[3])
             all_sprites.add(ball)
-            pos_x -= 70
-        pos_x = 30
-        for i in range(10):
-            ball = Ball(3, pos_x, 190)
+            pos_x -= for_level1[4]
+        pos_x = for_level1[7]
+        for i in range(for_level1[10]):
+            ball = Ball(3, pos_x, for_level1[8])
             all_sprites.add(ball)
-            pos_x += 70
-        pos_x = 820
-        for i in range(10):
-            ball = Ball(3, pos_x, 305)
+            pos_x += for_level1[9]
+        pos_x = for_level1[12]
+        for i in range(for_level1[15]):
+            ball = Ball(3, pos_x, for_level1[13])
             all_sprites.add(ball)
-            pos_x -= 70
-        pos_x = 30
-        for i in range(11):
-            ball = Ball(3, pos_x, 425)
+            pos_x -= for_level1[14]
+        pos_x = for_level1[17]
+        for i in range(for_level1[20]):
+            ball = Ball(3, pos_x, for_level1[18])
             all_sprites.add(ball)
-            pos_x += 70
+            pos_x += for_level1[19]
     while running:
         right_running = False
         left_running = False
@@ -454,26 +454,29 @@ def lvl_2():
     woodcutter = WoodCutter(100, 696, 100, 195)
     woodcutter2 = WoodCutter(35, 815, 35, 415)
     score = 0
-    pos_x = 30
-    for i in range(9):
-        ball = Ball(3, pos_x, 85)
-        all_sprites.add(ball)
-        pos_x += 70
-    pos_x = 120
-    for i in range(10):
-        ball = Ball(3, pos_x, 205)
-        all_sprites.add(ball)
-        pos_x += 65
-    pos_x = 30
-    for i in range(14):
-        ball = Ball(3, pos_x, 320)
-        all_sprites.add(ball)
-        pos_x += 70
-    pos_x = 30
-    for i in range(11):
-        ball = Ball(3, pos_x, 430)
-        all_sprites.add(ball)
-        pos_x += 70
+    with open('points.csv', encoding="utf8") as csvfile:
+        reader = list(csv.reader(csvfile, delimiter=';', quotechar='"'))[1:]
+        for_level2 = list(map(int, reader[1]))
+        pos_x = for_level2[2]
+        for i in range(for_level2[5]):
+            ball = Ball(3, pos_x, for_level2[3])
+            all_sprites.add(ball)
+            pos_x += for_level2[4]
+        pos_x = for_level2[7]
+        for i in range(for_level2[10]):
+            ball = Ball(3, pos_x, for_level2[8])
+            all_sprites.add(ball)
+            pos_x += for_level2[9]
+        pos_x = for_level2[12]
+        for i in range(for_level2[15]):
+            ball = Ball(3, pos_x, for_level2[13])
+            all_sprites.add(ball)
+            pos_x += for_level2[14]
+        pos_x = for_level2[17]
+        for i in range(for_level2[20]):
+            ball = Ball(3, pos_x, for_level2[18])
+            all_sprites.add(ball)
+            pos_x += for_level2[19]
     while running:
         # print(knight.rect.x, knight.rect.y)
         right_running = False
@@ -573,26 +576,29 @@ def lvl_3():
     key = GoldenKey(785, 50)
     lock = Lock(788, 393)
     all_sprites.add(sphere, sphere2, key, lock)
-    pos_x = 200
-    for i in range(9):
-        ball = Ball(3, pos_x, 85)
-        all_sprites.add(ball)
-        pos_x += 70
-    pos_x = 55
-    for i in range(11):
-        ball = Ball(3, pos_x, 205)
-        all_sprites.add(ball)
-        pos_x += 65
-    pos_x = 60
-    for i in range(14):
-        ball = Ball(3, pos_x, 320)
-        all_sprites.add(ball)
-        pos_x += 70
-    pos_x = 30
-    for i in range(11):
-        ball = Ball(3, pos_x, 430)
-        all_sprites.add(ball)
-        pos_x += 70
+    with open('points.csv', encoding="utf8") as csvfile:
+        reader = list(csv.reader(csvfile, delimiter=';', quotechar='"'))[1:]
+        for_level2 = list(map(int, reader[1]))
+        pos_x = for_level2[2]
+        for i in range(for_level2[5]):
+            ball = Ball(3, pos_x, for_level2[3])
+            all_sprites.add(ball)
+            pos_x += for_level2[4]
+        pos_x = for_level2[7]
+        for i in range(for_level2[10]):
+            ball = Ball(3, pos_x, for_level2[8])
+            all_sprites.add(ball)
+            pos_x += for_level2[9]
+        pos_x = for_level2[12]
+        for i in range(for_level2[15]):
+            ball = Ball(3, pos_x, for_level2[13])
+            all_sprites.add(ball)
+            pos_x += for_level2[14]
+        pos_x = for_level2[17]
+        for i in range(for_level2[20]):
+            ball = Ball(3, pos_x, for_level2[18])
+            all_sprites.add(ball)
+            pos_x += for_level2[19]
     while running:
         print(knight.rect.x, knight.rect.y)
         # print(sphere.rect.x)
@@ -603,7 +609,7 @@ def lvl_3():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        if ((112 < knight.rect.x < 152 and 60 <= knight.rect.y < 180) or (60 < knight.rect.x < 200 and 60 <= knight.rect.y < 180 and falling)) and check_of_fall3:
+        if ((112 < knight.rect.x < 152 and 60 <= knight.rect.y < 180) or (60 < knight.rect.x < 300 and 60 <= knight.rect.y < 180 and falling)) and check_of_fall3:
             knight.rect.y += 10
             clock.tick(70)
             falling = True
@@ -682,4 +688,4 @@ def lvl_3():
 
 
 if __name__ == '__main__':
-    main()
+    lvl_3()
