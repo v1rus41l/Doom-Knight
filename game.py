@@ -3,11 +3,10 @@ import sys
 import csv
 import pygame
 
+
+wasd_cfg = False
+defolt_cfg = True
 while True:
-    # print(2)
-    # pygame.init()
-    # size = width, height = 850, 450
-    # screen = pygame.display.set_mode(size)
     def load_image(name, colorkey=None):
         fullname = os.path.join('data', name)
         # если файл не существует, то выходим
@@ -25,9 +24,6 @@ while True:
         return image
 
     WIDTH, HEIGHT = 850, 450
-
-    wasd_cfg = False
-    defolt_cfg = True
     knight_img = [pygame.image.load('data/3.png'),
                   pygame.image.load('data/4.png'), pygame.image.load('data/5.png'), pygame.image.load('data/6.png'),
                   pygame.image.load('data/5.png'), pygame.image.load('data/4.png'), pygame.image.load('data/3.png')]
@@ -757,39 +753,76 @@ while True:
             if knight.rect.y == 400:
                 check_of_fall_23 = False
                 falling = False
-            if pygame.key.get_pressed()[pygame.K_RIGHT]:
-                action = True
-                Knight.animation(knight, vector)
-                if knight.rect.x <= 800 and not left_running:
-                    knight_running_count += 1
-                    if knight_running_count == 4:
-                        right_running = True
-                        knight.rect.x += 2
-                        vector = True
-                        knight_running_count = 0
-            else:
-                right_running = False
-            if pygame.key.get_pressed()[pygame.K_LEFT]:
-                Knight.animation(knight, vector)
-                action = True
-                if knight.rect.x >= 0 and not right_running:
-                    knight_running_count += 1
-                    if knight_running_count == 4:
-                        left_running = True
-                        knight.rect.x -= 2
-                        vector = False
-                        knight_running_count = 0
-            else:
-                left_running = False
-            if pygame.key.get_pressed()[pygame.K_UP] and not falling:
-                if 760 < knight.rect.x < 790 and knight.rect.y == 400:
-                    youwin = True
+            if defolt_cfg:
+                if pygame.key.get_pressed()[pygame.K_RIGHT]:
+                    action = True
+                    Knight.animation(knight, vector)
+                    if knight.rect.x <= 800 and not left_running:
+                        knight_running_count += 1
+                        if knight_running_count == 4:
+                            right_running = True
+                            knight.rect.x += 2
+                            vector = True
+                            knight_running_count = 0
                 else:
-                    is_jump = True
-            if is_jump:
-                Knight.jumping(knight, vector)
-            if not action and not is_jump:
-                Knight.staying(knight, vector)
+                    right_running = False
+
+                if pygame.key.get_pressed()[pygame.K_LEFT]:
+                    Knight.animation(knight, vector)
+                    action = True
+                    if knight.rect.x >= 0 and not right_running:
+                        knight_running_count += 1
+                        if knight_running_count == 4:
+                            left_running = True
+                            knight.rect.x -= 2
+                            vector = False
+                            knight_running_count = 0
+                else:
+                    left_running = False
+                if pygame.key.get_pressed()[pygame.K_UP] and not falling:
+                    if 760 < knight.rect.x < 790 and knight.rect.y == 400:
+                        youwin = True
+                    else:
+                        is_jump = True
+                if is_jump:
+                    Knight.jumping(knight, vector)
+                if not action and not is_jump:
+                    Knight.staying(knight, vector)
+            elif wasd_cfg:
+                if pygame.key.get_pressed()[pygame.K_d]:
+                    action = True
+                    Knight.animation(knight, vector)
+                    if knight.rect.x <= 800 and not left_running:
+                        knight_running_count += 1
+                        if knight_running_count == 4:
+                            right_running = True
+                            knight.rect.x += 2
+                            vector = True
+                            knight_running_count = 0
+                else:
+                    right_running = False
+
+                if pygame.key.get_pressed()[pygame.K_a]:
+                    Knight.animation(knight, vector)
+                    action = True
+                    if knight.rect.x >= 0 and not right_running:
+                        knight_running_count += 1
+                        if knight_running_count == 4:
+                            left_running = True
+                            knight.rect.x -= 2
+                            vector = False
+                            knight_running_count = 0
+                else:
+                    left_running = False
+                if pygame.key.get_pressed()[pygame.K_w] and not falling:
+                    if 760 < knight.rect.x < 790 and knight.rect.y == 400:
+                        youwin = True
+                    else:
+                        is_jump = True
+                if is_jump:
+                    Knight.jumping(knight, vector)
+                if not action and not is_jump:
+                    Knight.staying(knight, vector)
             intro_text = f'Очки: {score}'
             font = pygame.font.Font(None, 40)
             string_rendered = font.render(intro_text, 1, pygame.Color('white'))
