@@ -6,6 +6,7 @@ import pygame
 
 wasd_cfg = False
 defolt_cfg = True
+
 while True:
     def load_image(name, colorkey=None):
         fullname = os.path.join('data', name)
@@ -293,7 +294,7 @@ while True:
                 self.check = False
                 self.vector = True
             if self.check:
-                self.rect.x -=1
+                self.rect.x -= 1
             else:
                 self.rect.x += 1
             # clock.tick(150)
@@ -522,7 +523,7 @@ while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     terminate()
-            if counter_of_updating == 9:
+            if counter_of_updating == 17:
                 Skeleton.running(skeleton)
                 Skeleton.running(skeleton2)
                 counter_of_updating = 0
