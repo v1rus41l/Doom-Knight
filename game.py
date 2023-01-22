@@ -58,6 +58,9 @@ vector = False
 jump_count_wc = 10
 woodcutter_count = 10
 locking = True
+gameover = False
+youwin = False
+knight_jump_count = 0
 
 
 
@@ -82,30 +85,33 @@ class Knight(pygame.sprite.Sprite):
 
     def animation(self, vector):
         global img_count, is_jump
-        if img_count == 30:
+        if img_count == 300:
             img_count = 0
         if not is_jump:
             if vector:
-                screen.blit(knight_img[img_count // 5], (self.rect.x, self.rect.y))
+                screen.blit(knight_img[img_count // 50], (self.rect.x, self.rect.y))
             else:
-                screen.blit(pygame.transform.flip(knight_img[img_count // 5], True, False), (self.rect.x, self.rect.y))
+                screen.blit(pygame.transform.flip(knight_img[img_count // 50], True, False), (self.rect.x, self.rect.y))
         img_count += 1
-        clock.tick(150)
 
     def jumping(self, vector):
-        global jump_count, is_jump
+        global jump_count, is_jump, knight_jump_count
+
         if vector:
             screen.blit(pygame.image.load('data/2.png'), (self.rect.x, self.rect.y))
         else:
             screen.blit(pygame.transform.flip(pygame.image.load('data/2.png'), True, False), (self.rect.x, self.rect.y))
         if jump_count >= -10:
-            self.rect.y -= jump_count
-            jump_count -= 1
-            clock.tick(70)
+            if knight_jump_count == 10:
+                self.rect.y -= jump_count
+                jump_count -= 1
+                knight_jump_count = 0
+                # clock.tick(70)
         else:
             jump_count = 10
-            clock.tick(70)
+            # clock.tick(70)
             is_jump = False
+        knight_jump_count += 1
 
 
 
@@ -130,9 +136,9 @@ class Skeleton(pygame.sprite.Sprite):
 
 
     def update(self, knight):
-        global running
+        global gameover
         if pygame.sprite.collide_mask(self, knight):
-            running = False
+            gameover = True
 
 
     def running(self):
@@ -144,27 +150,20 @@ class Skeleton(pygame.sprite.Sprite):
             self.check = False
             self.vector = True
         if self.check:
-            if action:
-                self.rect.x -= 2
-            else:
-                self.rect.x -= 1
+            self.rect.x -=1
         else:
-            if action:
-                self.rect.x += 2
-            else:
-                self.rect.x += 1
-        clock.tick(150)
+            self.rect.x += 1
+        # clock.tick(150)
 
     def animation(self):
         global skeleton_count, skeleton_img
-        if skeleton_count == 30:
+        if skeleton_count == 400:
             skeleton_count = 0
         if self.vector:
-            screen.blit(skeleton_img[skeleton_count // 15], (self.rect.x, self.rect.y))
+            screen.blit(skeleton_img[skeleton_count // 200], (self.rect.x, self.rect.y))
         else:
-            screen.blit(pygame.transform.flip(skeleton_img[skeleton_count // 15], True, False), (self.rect.x, self.rect.y))
+            screen.blit(pygame.transform.flip(skeleton_img[skeleton_count // 200], True, False), (self.rect.x, self.rect.y))
         skeleton_count += 1
-        clock.tick(150)
 
 
 
@@ -191,9 +190,9 @@ class WoodCutter(pygame.sprite.Sprite):
 
 
     def update(self, knight):
-        global running
+        global running, gameover
         if pygame.sprite.collide_mask(self, knight):
-            running = False
+            gameover = True
 
 
     def running(self):
@@ -218,14 +217,14 @@ class WoodCutter(pygame.sprite.Sprite):
 
     def animation(self):
         global woodcutter_count, woodcutter_image
-        if woodcutter_count == 30:
+        if woodcutter_count == 300:
             woodcutter_count = 0
         if self.vector:
-            screen.blit(woodcutter_image[woodcutter_count // 10], (self.rect.x, self.rect.y))
+            screen.blit(woodcutter_image[woodcutter_count // 100], (self.rect.x, self.rect.y))
         else:
-            screen.blit(pygame.transform.flip(woodcutter_image[woodcutter_count // 15], True, False), (self.rect.x, self.rect.y))
+            screen.blit(pygame.transform.flip(woodcutter_image[woodcutter_count // 150], True, False), (self.rect.x, self.rect.y))
         woodcutter_count += 1
-        clock.tick(300)
+        # clock.tick(300)
 
 
     def jumping(self):
@@ -314,20 +313,20 @@ class Sphere(pygame.sprite.Sprite):
 
     def actioning(self):
         global action
-        self.rect.x += 10
-        clock.tick(300)
+        self.rect.x += 9
+        # clock.tick(300)
         if self.rect.x > 850:
             self.rect.x = self.x
 
 
     def update(self, knight):
-        global running
+        global gameover
         if pygame.sprite.collide_mask(self, knight):
-            running = False
+            gameover = True
 
 
 def main():
-    global is_jump, action, check_of_fall1, check_of_fall_12, check_of_fall_13, falling, running, score, knight, vector
+    global is_jump, action, check_of_fall1, check_of_fall_12, check_of_fall_13, falling, running, score, knight, vector, gameover, youwin
     pygame.init()
     knight = Knight(800, 50)
     size = width, height = 850, 450
@@ -341,6 +340,13 @@ def main():
     skeleton2 = Skeleton(200, 840, 840, 300)
     skeleton_group.add(skeleton2)
     score = 0
+    counter_of_updating = 0
+    gameover = False
+    youwin = True
+    right_running = False
+    left_running = False
+    knight_running_count = 0
+    knight_falling_count = 0
     with open('points.csv', encoding="utf8") as csvfile:
         reader = list(csv.reader(csvfile, delimiter=';', quotechar='"'))[1:]
         for_level1 = list(map(int, reader[0]))
@@ -365,54 +371,72 @@ def main():
             all_sprites.add(ball)
             pos_x += for_level1[19]
     while running:
-        right_running = False
-        left_running = False
+        counter_of_updating += 1
         action = False
         screen.blit(fon, (0, 0))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+        if counter_of_updating == 9:
+            Skeleton.running(skeleton)
+            Skeleton.running(skeleton2)
+            counter_of_updating = 0
         if ((knight.rect.x < 125 and knight.rect.y != 170) or (knight.rect.x < 255 and knight.rect.y != 170 and 50 < knight.rect.y < 170)) and check_of_fall1 and knight.rect.y >= 50:
-            knight.rect.y += 10
-            clock.tick(70)
+            knight_falling_count += 1
+            if knight_falling_count == 2:
+                knight.rect.y += 2
+                knight_falling_count = 0
             falling = True
         if knight.rect.y == 170:
             check_of_fall1 = False
             falling = False
         if ((knight.rect.x > 680 and knight.rect.y > 50 and knight.rect.y != 290) or (knight.rect.x > 600 and knight.rect.y > 50 and knight.rect.y != 290 and 170 < knight.rect.y < 290)) and check_of_fall_12 and knight.rect.y >= 170:
-            knight.rect.y += 10
-            clock.tick(70)
+            knight_falling_count += 1
+            if knight_falling_count == 2:
+                knight.rect.y += 2
+                knight_falling_count = 0
             falling = True
         if knight.rect.y == 290:
             check_of_fall_12 = False
             falling = False
             knight.rect.y -= 5
         if ((knight.rect.x < 130 and knight.rect.y != 405 and 285 <= knight.rect.y) or (knight.rect.x < 200 and knight.rect.y != 405 and 285 <= knight.rect.y and 285 < knight.rect.y < 405)) and check_of_fall_13 and knight.rect.y >= 285:
-            knight.rect.y += 10
-            clock.tick(70)
+            knight_falling_count += 1
+            if knight_falling_count == 2:
+                knight.rect.y += 2
+                knight_falling_count = 0
             falling = True
         if knight.rect.y == 405:
             check_of_fall_13 = False
             falling = False
             knight.rect.y -= 5
-        if pygame.key.get_pressed()[pygame.K_RIGHT] or pygame.key.get_pressed()[pygame.K_LEFT]:
-            if pygame.key.get_pressed()[pygame.K_RIGHT]:
-                if knight.rect.x <= 800 and not left_running:
+        if pygame.key.get_pressed()[pygame.K_RIGHT]:
+            action = True
+            Knight.animation(knight, vector)
+            if knight.rect.x <= 800 and not left_running:
+                knight_running_count += 1
+                if knight_running_count == 3:
                     right_running = True
-                    knight.rect.x += 4
+                    knight.rect.x += 1
                     vector = True
-                    Knight.animation(knight, vector)
-                    action = True
-            if pygame.key.get_pressed()[pygame.K_LEFT]:
-                if knight.rect.x >= 0 and not right_running:
+                    knight_running_count = 0
+        else:
+            right_running = False
+        if pygame.key.get_pressed()[pygame.K_LEFT]:
+            Knight.animation(knight, vector)
+            action = True
+            if knight.rect.x >= 0 and not right_running:
+                knight_running_count += 1
+                if knight_running_count == 3:
                     left_running = True
-                    knight.rect.x -= 4
+                    knight.rect.x -= 1
                     vector = False
-                    Knight.animation(knight, vector)
-                    action = True
+                    knight_running_count = 0
+        else:
+            left_running = False
         if pygame.key.get_pressed()[pygame.K_UP] and not falling:
             if 760 < knight.rect.x < 790 and knight.rect.y == 400:
-                running = False
+                youwin = True
             else:
                 is_jump = True
         if is_jump:
@@ -429,10 +453,28 @@ def main():
         skeleton_group.update(knight)
         Skeleton.animation(skeleton)
         Skeleton.animation(skeleton2)
-        Skeleton.running(skeleton2)
-        Skeleton.running(skeleton)
         all_sprites.draw(screen)
         all_sprites.update(knight)
+        if gameover:
+            fon = pygame.transform.scale(load_image('game_over.jpg'), (width, height))
+            screen.blit(fon, (0, 0))
+            intro_text = f'Очки: {score}'
+            font = pygame.font.Font(None, 40)
+            string_rendered = font.render(intro_text, 1, pygame.Color('white'))
+            intro_rect = string_rendered.get_rect()
+            intro_rect.x = 300
+            intro_rect.y = 250
+            screen.blit(string_rendered, intro_rect)
+        if youwin:
+            fon = pygame.transform.scale(load_image('win_game.jpg'), (width, height))
+            screen.blit(fon, (0, 0))
+            intro_text = f'Score: {score}'
+            font = pygame.font.Font('data/pixelfont.ttf', 50)
+            string_rendered = font.render(intro_text, 1, pygame.Color('white'))
+            intro_rect = string_rendered.get_rect()
+            intro_rect.x = 320
+            intro_rect.y = 180
+            screen.blit(string_rendered, intro_rect)
         pygame.display.flip()
     pygame.quit()
 
@@ -634,7 +676,7 @@ def lvl_3():
         if pygame.key.get_pressed()[pygame.K_RIGHT]:
             if knight.rect.x <= 800 and not left_running:
                 right_running = True
-                knight.rect.x += 9
+                knight.rect.x += 1
                 vector = True
                 Knight.animation(knight, vector)
                 action = True
@@ -642,7 +684,7 @@ def lvl_3():
             if knight.rect.x >= 0 and not right_running:
                 if not (knight.rect.x <= 32 and 70 < knight.rect.y <= 180) and not (knight.rect.x <= 32 and 190 < knight.rect.y <= 290):
                     left_running = True
-                    knight.rect.x -= 9
+                    knight.rect.x -= 1
                     vector = False
                     Knight.animation(knight, vector)
                     action = True
@@ -688,4 +730,4 @@ def lvl_3():
 
 
 if __name__ == '__main__':
-    lvl_3()
+    main()
