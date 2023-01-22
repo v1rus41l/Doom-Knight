@@ -96,5 +96,22 @@ def level_changing():
         clock.tick(FPS)
 
 
+def game_over_screen():
+    fon = pygame.transform.scale(load_image('game_over.jpg'), (WIDTH, HEIGHT))
+    screen.blit(fon, (0, 0))
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x1, y1 = event.pos
+                print(x1, y1)
+                if 78 <= x1 <= 158 and 336 <= y1 <= 415:
+                    level_changing()
+                if 707 <= x1 <= 783 and 336 <= y1 <= 415:
+                    print(2)
+        pygame.display.flip()
+
+
 if __name__ == '__main__':
-    start_screen()
+    game_over_screen()
