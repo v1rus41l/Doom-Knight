@@ -861,7 +861,7 @@ while True:
         sphere = Sphere(35, 191)
         sphere2 = Sphere(35, 300)
         screen.blit(fon, (0, 0))
-        woodcutter = WoodCutter(169, 825, 169, 75)
+        woodcutter = WoodCutter(169, 825, 825, 75)
         woodcutter2 = WoodCutter(40, 820, 40, 415)
         skeleton = Skeleton(40, 710, 40, 195)
         skeleton2 = Skeleton(172, 825, 172, 305)
@@ -902,6 +902,7 @@ while True:
             counter_of_jump += 1
             action = False
             screen.blit(fon, (0, 0))
+            all_sprites.draw(screen)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     terminate()
@@ -1035,7 +1036,6 @@ while True:
             WoodCutter.animation(woodcutter2)
             Skeleton.animation(skeleton)
             Skeleton.animation(skeleton2)
-            all_sprites.draw(screen)
             all_sprites.update(knight)
             skeleton_group.update(knight)
             pygame.display.flip()
